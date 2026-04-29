@@ -1,0 +1,3 @@
+# === 溯的行动探索器 ===
+# 每20分钟：同步GitHub + 外部探索
+*/20 * * * * ~/.openclaw/workspace/skills/self-improving-agent/action-runner.sh

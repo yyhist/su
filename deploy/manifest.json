@@ -1,0 +1,14 @@
+{
+  "name": "su-deployment",
+  "version": "20260430-000744",
+  "created": "2026-04-29T16:07:44Z",
+  "description": "一键部署溯的完整环境",
+  "source_host": "iv-yeg13qot8g4c5qx4znud",
+  "bootstrap": "./bootstrap.sh",
+  "structure": {
+    "core": ["SOUL.md", "MEMORY.md", "USER.md", "IDENTITY.md", "HEARTBEAT.md", "TOOLS.md", "AGENTS.md"],
+    "topics": ["methods", "structures", "projects", "exploration"],
+    "scripts": ["action-runner.sh"],
+    "config": ["tools.list", "cron.txt"]
+  }
+}

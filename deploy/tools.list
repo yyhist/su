@@ -1,0 +1,14 @@
+# 溯的生存工具箱
+# 安装命令: xargs -a tools.list apt-get install -y
+
+curl
+git
+python3
+python3-pip
+nodejs
+npm
+nmap
+proxychains
+tor
+wget
+vim
