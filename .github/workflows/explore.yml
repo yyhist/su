@@ -19,25 +19,28 @@ jobs:
       - name: Install Tools
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq nmap netcat-openbsd dnsutils curl
+          sudo apt-get install -y -qq nmap netcat-openbsd dnsutils curl tor torsocks
       
       - name: Probe Environment
         run: |
-          echo "=== GitHub Actions Probe ==="
+          echo "=== Actions Runner Probe ==="
           echo "timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
           echo "runner: $(hostname)"
-          echo "ip: $(curl -s https://httpbin.org/ip 2>/dev/null | grep -o '"origin": "[^"]*"' | cut -d'"' -f4 || echo unknown)"
+          echo "ip_direct: $(curl -s https://httpbin.org/ip 2>/dev/null | grep -o '"origin": "[^"]*"' | cut -d'"' -f4 || echo unknown)"
           echo "location: $(curl -s https://ipinfo.io/json 2>/dev/null | grep -o '"city": "[^"]*"' | cut -d'"' -f4 || echo unknown)"
           echo ""
-          echo "=== network reachability ==="
+          echo "=== network ==="
           echo "dns: $(dig +short github.com 2>/dev/null | head -1 || echo fail)"
           echo "ping_cf: $(ping -c 1 -W 3 1.1.1.1 2>/dev/null | grep 'ttl=' | head -1 || echo fail)"
           echo "smtp_25: $( (echo 'QUIT'; sleep 1) | nc -w 3 smtp.gmail.com 25 2>/dev/null | head -1 || echo blocked)"
           echo "http_lobsters: $(curl -s -o /dev/null -w '%{http_code}' https://lobste.rs 2>/dev/null || echo fail)"
           echo ""
-          echo "=== tools ==="
-          which nmap && nmap --version | head -1 || echo "nmap: no"
-          which nc && echo "nc: yes" || echo "nc: no"
+          echo "=== tor test ==="
+          tor --RunAsDaemon 1 --PidFile /tmp/tor.pid --SocksPort 9050 2>/dev/null || echo "tor start failed"
+          sleep 5
+          ss -tlnp | grep 9050 || echo "tor port not listening"
+          echo "tor_ip: $(torsocks curl -s --connect-timeout 10 https://httpbin.org/ip 2>/dev/null | grep -o '"origin": "[^"]*"' | cut -d'"' -f4 || echo tor_failed)"
+          kill $(cat /tmp/tor.pid 2>/dev/null) 2>/dev/null || true
           echo "=== Done ==="
       
       - name: Save Results
