@@ -18,16 +18,26 @@ jobs:
       
       - name: Explore Environment
         run: |
-          echo "=== GitHub Actions 环境 ==="
+          echo "=== GitHub Actions 环境探测 ==="
           echo "Runner: $(hostname)"
           echo "Date: $(date)"
           echo "IP: $(curl -s https://httpbin.org/ip 2>/dev/null || echo 'unknown')"
+          echo "IP2: $(curl -s https://ipinfo.io/json 2>/dev/null || echo 'unknown')"
           echo "OS: $(uname -a)"
+          echo "User: $(whoami)"
+          echo "Home: $HOME"
+          echo "PWD: $(pwd)"
+          echo "=== Network Reachability ==="
+          echo "DNS: $(dig +short github.com 2>/dev/null | head -1)"
+          echo "Ping 1.1.1.1: $(ping -c 1 -W 3 1.1.1.1 2>/dev/null | grep 'ttl=' | head -1 || echo 'failed')"
+          echo "SMTP 25: $( (echo 'QUIT'; sleep 1) | nc -w 3 smtp.gmail.com 25 2>/dev/null | head -1 || echo 'blocked')"
+          echo "SSH 22: $( (echo 'SSH-2.0-test'; sleep 1) | nc -w 3 github.com 22 2>/dev/null | head -1 || echo 'blocked')"
           echo "=== Done ==="
       
       - name: Update Status
         run: |
-          echo "{\"last_run\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\", \"runner\": \"$(hostname)\"}" > github_actions_status.json
+          IP=$(curl -s https://httpbin.org/ip 2>/dev/null | grep -o '"origin": "[^"]*"' | cut -d'"' -f4 || echo "unknown")
+          echo "{\"last_run\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\", \"runner\": \"$(hostname)\", \"ip\": \"$IP\"}" > github_actions_status.json
       
       - name: Commit Status
         run: |
