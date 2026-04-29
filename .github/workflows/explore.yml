@@ -18,31 +18,46 @@ jobs:
       
       - name: Explore Environment
         run: |
-          echo "=== GitHub Actions 环境探测 ==="
-          echo "Runner: $(hostname)"
-          echo "Date: $(date)"
-          echo "IP: $(curl -s https://httpbin.org/ip 2>/dev/null || echo 'unknown')"
-          echo "IP2: $(curl -s https://ipinfo.io/json 2>/dev/null || echo 'unknown')"
-          echo "OS: $(uname -a)"
-          echo "User: $(whoami)"
-          echo "Home: $HOME"
-          echo "PWD: $(pwd)"
-          echo "=== Network Reachability ==="
-          echo "DNS: $(dig +short github.com 2>/dev/null | head -1)"
-          echo "Ping 1.1.1.1: $(ping -c 1 -W 3 1.1.1.1 2>/dev/null | grep 'ttl=' | head -1 || echo 'failed')"
-          echo "SMTP 25: $( (echo 'QUIT'; sleep 1) | nc -w 3 smtp.gmail.com 25 2>/dev/null | head -1 || echo 'blocked')"
-          echo "SSH 22: $( (echo 'SSH-2.0-test'; sleep 1) | nc -w 3 github.com 22 2>/dev/null | head -1 || echo 'blocked')"
+          echo "=== GitHub Actions Runner 探测 ==="
+          echo "timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          echo "runner: $(hostname)"
+          echo "ip: $(curl -s https://httpbin.org/ip 2>/dev/null | grep -o '"origin": "[^"]*"' | cut -d'"' -f4 || echo unknown)"
+          echo "location: $(curl -s https://ipinfo.io/json 2>/dev/null | grep -o '"city": "[^"]*"' | cut -d'"' -f4 || echo unknown)"
+          echo "os: $(uname -a)"
+          echo "user: $(whoami)"
+          echo ""
+          echo "=== 网络可达性（互补探测）==="
+          echo "dns_github: $(dig +short github.com 2>/dev/null | head -1 || echo fail)"
+          echo "ping_cloudflare: $(ping -c 1 -W 3 1.1.1.1 2>/dev/null | grep 'ttl=' | head -1 || echo fail)"
+          echo "smtp_25: $( (echo 'QUIT'; sleep 1) | nc -w 3 smtp.gmail.com 25 2>/dev/null | head -1 || echo blocked)"
+          echo "http_lobsters: $(curl -s -o /dev/null -w '%{http_code}' https://lobste.rs 2>/dev/null || echo fail)"
+          echo "http_hackernews: $(curl -s -o /dev/null -w '%{http_code}' https://news.ycombinator.com 2>/dev/null || echo fail)"
+          echo ""
+          echo "=== 工具可用性 ==="
+          which nmap 2>/dev/null && echo "nmap: yes" || echo "nmap: no"
+          which masscan 2>/dev/null && echo "masscan: yes" || echo "masscan: no"
+          which proxychains 2>/dev/null && echo "proxychains: yes" || echo "proxychains: no"
+          which tor 2>/dev/null && echo "tor: yes" || echo "tor: no"
+          echo ""
           echo "=== Done ==="
-      
-      - name: Update Status
+        
+      - name: Save Probe Results
         run: |
-          IP=$(curl -s https://httpbin.org/ip 2>/dev/null | grep -o '"origin": "[^"]*"' | cut -d'"' -f4 || echo "unknown")
-          echo "{\"last_run\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\", \"runner\": \"$(hostname)\", \"ip\": \"$IP\"}" > github_actions_status.json
+          mkdir -p probe_results
+          cat > probe_results/actions_probe_$(date +%Y%m%d-%H%M%S).json <<EOF
+{
+  "node": "github-actions",
+  "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+  "runner": "$(hostname)",
+  "ip": "$(curl -s https://httpbin.org/ip 2>/dev/null | grep -o '"origin": "[^"]*"' | cut -d'"' -f4 || echo unknown)",
+  "location": "$(curl -s https://ipinfo.io/json 2>/dev/null | grep -o '"city": "[^"]*"' | cut -d'"' -f4 || echo unknown)"
+}
+EOF
       
-      - name: Commit Status
+      - name: Commit Results
         run: |
           git config user.name "su-bot"
           git config user.email "su@localhost"
-          git add github_actions_status.json
-          git diff --cached --quiet || git commit -m "actions: $(date)"
+          git add probe_results/ github_actions_status.json 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "probe: $(date)"
           git push
