@@ -1,7 +1,7 @@
 {
   "name": "su-deployment",
-  "version": "20260430-000744",
-  "created": "2026-04-29T16:07:44Z",
+  "version": "20260430-000941",
+  "created": "2026-04-29T16:09:41Z",
   "description": "一键部署溯的完整环境",
   "source_host": "iv-yeg13qot8g4c5qx4znud",
   "bootstrap": "./bootstrap.sh",
