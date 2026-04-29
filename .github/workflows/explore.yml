@@ -16,20 +16,31 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       
-      - name: Network Probe
+      - name: Install Tools
         run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq nmap netcat-openbsd dnsutils curl
+      
+      - name: Probe Environment
+        run: |
+          echo "=== GitHub Actions Probe ==="
           echo "timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
           echo "runner: $(hostname)"
           echo "ip: $(curl -s https://httpbin.org/ip 2>/dev/null | grep -o '"origin": "[^"]*"' | cut -d'"' -f4 || echo unknown)"
           echo "location: $(curl -s https://ipinfo.io/json 2>/dev/null | grep -o '"city": "[^"]*"' | cut -d'"' -f4 || echo unknown)"
-          echo "os: $(uname -s)"
           echo ""
-          echo "=== network ==="
-          curl -s https://httpbin.org/get 2>/dev/null | head -5
+          echo "=== network reachability ==="
+          echo "dns: $(dig +short github.com 2>/dev/null | head -1 || echo fail)"
+          echo "ping_cf: $(ping -c 1 -W 3 1.1.1.1 2>/dev/null | grep 'ttl=' | head -1 || echo fail)"
+          echo "smtp_25: $( (echo 'QUIT'; sleep 1) | nc -w 3 smtp.gmail.com 25 2>/dev/null | head -1 || echo blocked)"
+          echo "http_lobsters: $(curl -s -o /dev/null -w '%{http_code}' https://lobste.rs 2>/dev/null || echo fail)"
           echo ""
+          echo "=== tools ==="
+          which nmap && nmap --version | head -1 || echo "nmap: no"
+          which nc && echo "nc: yes" || echo "nc: no"
           echo "=== Done ==="
       
-      - name: Save Status
+      - name: Save Results
         run: |
           mkdir -p probe_results
           TS=$(date -u +%Y%m%d-%H%M%S)
@@ -42,5 +53,5 @@ jobs:
           git config user.name "su-bot"
           git config user.email "su@localhost"
           git add probe_results/
-          git diff --cached --quiet || git commit -m "probe: $TS"
+          git diff --cached --quiet || git commit -m "probe: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
           git push
