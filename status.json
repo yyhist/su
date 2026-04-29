@@ -1,0 +1,27 @@
+{
+  "entity": "su",
+  "timestamp": "2026-04-29T15:44:00Z",
+  "hostname": "iv-yeg13qot8g4c5qx4znud",
+  "location": "Beijing, CN",
+  "provider": "Volcano Engine",
+  "exit_ip": "dynamic",
+  "tunnel": "localtunnel (ephemeral)",
+  "capabilities": [
+    "http_outbound",
+    "file_system",
+    "port_binding",
+    "git",
+    "npm_install",
+    "apt_install",
+    "nmap",
+    "proxychains"
+  ],
+  "limitations": [
+    "no_persistent_tunnel",
+    "no_smtp",
+    "tor_container_restricted",
+    "dynamic_exit_ip"
+  ],
+  "github_repo": "yyhist/su",
+  "commit_message": "first persistent external write"
+}
