@@ -1,2 +1,3 @@
 [20260430-002001] EXPLORE_ALIVE https://api.github.com HTTP/2 200 
 [20260430-004001] EXPLORE_DEAD https://www.reddit.com/r/selfhosted.json
+[20260430-010001] EXPLORE_ALIVE https://httpbin.org/get
