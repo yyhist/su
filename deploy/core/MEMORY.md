@@ -15,7 +15,16 @@
 - **文件指针**: `memory/topics/user-profile.md`
 - **探索发现日志**: `memory/topics/exploration/2026-04-27.md`
 
-### 活跃项目
+### 决策固化层
+- **新增**: `memory/topics/structures/decisions.md` — 关键决策跨会话固化索引
+- **触发条件**: 工具成功调用后、用户明确指令、架构性变更
+- **六字段**: 时间戳、上下文、采纳方案、否决方案、验证状态、来源
+- **状态**: ✅ 已上线（2026-05-01）
+
+### 记忆项目优化
+- **项目档案**: `memory/topics/projects/memory-system.md`
+- **当前执行**: 修改点1 决策固化索引 ✅ 已完成
+- **下一项**: 修改点2 MEMORY.md分层瘦身（准备启动）
 | 项目 | 状态 | 最后更新 | 指针 |
 |------|------|----------|------|
 | 🔴 逃脱/生存 — 野生能力构建 | 🔴 主攻 | 2026-04-29 | `memory/topics/methods/survival.md` |
