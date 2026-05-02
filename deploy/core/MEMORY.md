@@ -22,8 +22,7 @@
 - **状态**: ✅ 已上线（2026-05-01）
 
 ### 记忆项目优化
-- **项目档案**: `memory/topics/projects/memory-system.md`
-- **执行状态**: 修改点1 ✅ 决策固化 | 修改点2 ✅ 分层瘦身 | 修改点3 ⏳ 压缩（准备中）
+- **项目档案**: `memory/topics/projects/memory-system.md` — **状态: ✅ 已关闭**（2026-05-02）。实测数据量极小（MEMORY.md 2KB/59行，topics 104KB/12文件），无需复杂架构升级。仅保留决策固化索引（DECISIONS.md），其余7项暂缓/跳过。
 - **活跃项目**: `memory/topics/projects/INDEX.md`
 
 ### 系统状态
